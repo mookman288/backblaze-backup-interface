@@ -64,9 +64,9 @@ then
 fi
 
 # Delete older files.
-find . -name "*.log" -mindepth 1 -mtime +3 -delete
-find . -name "*.tmp" -mindepth 1 -mtime +3 -delete
-find . -name "*.txt" -mindepth 1 -mtime +3 -delete
+find . -mindepth 1 -mtime +3 -delete -name "*.log"
+find . -mindepth 1 -mtime +3 -delete-name "*.tmp"
+find . -mindepth 1 -mtime +3 -delete-name "*.txt"
 
 if [ -z "$0" ];
 then
