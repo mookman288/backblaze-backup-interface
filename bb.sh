@@ -55,7 +55,7 @@ if [ ! hash mktemp 2>/dev/null ];
 then
 	tmpDir="/tmp/bb.sh"
 else
-	tmpDir=$(mktemp)
+	tmpDir=$(mktemp -d)
 fi
 
 if [ ! -d "${tmpDir}" ];
