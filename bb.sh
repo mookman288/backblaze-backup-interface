@@ -117,6 +117,7 @@ echo "Cancelling all unfinished large files..."
 b2 cancel_all_unfinished_large_files $bucketName
 
 logBackup="${PWD}/${currentDate}-${bucketName}-backup.log"
+logBackupAlt="${PWD}/${currentDate}-${bucketName}-backup-alt.log"
 
 if [ "$backupType" == "mysql" ];
 then
@@ -152,7 +153,7 @@ then
 		mysqldump --skip-lock-tables --add-drop-table --allow-keywords -u $mysqlUsername -p$mysqlPassword ${database} | gzip > "${tmpDir}/${database}.tar.gz"
 
 		#Backup the database to Backblaze.
-		b2 upload-file $bucketName "${tmpDir}/${database}.tar.gz" "${database}.tar.gz" >> "${logBackup}" 2>&1
+		b2 upload-file $bucketName "${tmpDir}/${database}.tar.gz" "${database}.tar.gz" >> ${logBackup} 2>>${logBackupAlt}
 	done
 else
 	if [ -z "$4" ];
@@ -169,38 +170,38 @@ else
 
 	if [ -z "$5" ];
 	then
-		b2 sync --excludeAllSymlinks $syncPath "b2://$bucketName" > "${logBackup}" 2>&1
+		b2 sync --excludeAllSymlinks $syncPath "b2://$bucketName" > ${logBackup} 2>&1
 	else
-		b2 sync --excludeAllSymlinks --excludeRegex $5 $syncPath "b2://$bucketName" > "${logBackup}" 2>&1
+		b2 sync --excludeAllSymlinks --excludeRegex $5 $syncPath "b2://$bucketName" > ${logBackup} 2>&1
 	fi
 fi
 
 if [ -f "${logBackup}" ];
 then
+	tmpEmail="${PWD}/${currentDate}-${bucketName}-email.tmp"
+	txtEmail="${PWD}/${currentDate}-${bucketName}-email.txt"
+
+	if [ -f "${tmpEmail}" ];
+	then
+		rm "${tmpEmail}"
+	fi
+
+	if [ -f "${txtEmail}" ];
+	then
+		rm "${txtEmail}"
+	fi
+
 	if [ "$backupType" == "filesystem" ];
 	then
 		oldIFS=IFS
 		IFS=';;'
 
-		tmpEmail="${PWD}/${currentDate}-${bucketName}-email.tmp"
-		txtEmail="${PWD}/${currentDate}-${bucketName}-email.txt"
-
-		if [ -f "${tmpEmail}" ];
-		then
-			rm "${tmpEmail}"
-		fi
-
-		if [ -f "${txtEmail}" ];
-		then
-			rm "${txtEmail}"
-		fi
-
-		declare -a compare=( $(perl -ne 'while(m/(compare\:\s*[0-9]+\/[0-9]+\s*files)/g) { print "$1;;"; }' "${logBackup}" ) )
-		declare -a updated=( $(perl -ne 'while(m/(updated\:\s*[0-9]+\/[0-9]+\s*files)/g) { print "$1;;"; }' "${logBackup}" ) )
-		declare -a size=( $(perl -ne 'while(m/([0-9]{1,}\.{0,1}[0-9]{0,}\s*\/\s*[0-9]{1,}\.{0,1}[0-9]{0,}\s*[K|M|G|T][B])/g) { print "$1;;"; }' "${logBackup}" ) )
-		declare -a warnings=( $(perl -ne 'while(m/WARNING\:\s*(.*)[\n|\r|\t]/gm) { print "$1;;"; }' "${logBackup}" ) )
-		declare -a errors=( $(perl -ne 'while(m/ERROR\:\s*(.*)[\n|\r|\t]/gm) { print "$1;;"; }' "${logBackup}" ) )
-		declare -a services=( $(perl -ne 'while(m/ServiceError\:\s*(.*)[\n|\r|\t]/gm) { print "$1;;"; }' "${logBackup}" ) )
+		declare -a compare=( $(perl -ne 'while(m/(compare\:\s*[0-9]+\/[0-9]+\s*files)/g) { print "$1;;"; }' ${logBackup} ) )
+		declare -a updated=( $(perl -ne 'while(m/(updated\:\s*[0-9]+\/[0-9]+\s*files)/g) { print "$1;;"; }' ${logBackup} ) )
+		declare -a size=( $(perl -ne 'while(m/([0-9]{1,}\.{0,1}[0-9]{0,}\s*\/\s*[0-9]{1,}\.{0,1}[0-9]{0,}\s*[K|M|G|T][B])/g) { print "$1;;"; }' ${logBackup} ) )
+		declare -a warnings=( $(perl -ne 'while(m/WARNING\:\s*(.*)[\n|\r|\t]/gm) { print "$1;;"; }' ${logBackup} ) )
+		declare -a errors=( $(perl -ne 'while(m/ERROR\:\s*(.*)[\n|\r|\t]/gm) { print "$1;;"; }' ${logBackup} ) )
+		declare -a services=( $(perl -ne 'while(m/ServiceError\:\s*(.*)[\n|\r|\t]/gm) { print "$1;;"; }' ${logBackup} ) )
 
 		if [ ! -z "$errors" ];
 		then
@@ -292,17 +293,28 @@ then
 			fi
 		fi
 
-		if [ -f "${tmpEmail}" ];
-		then
-			cat "${tmpEmail}" > "${txtEmail}"
 
-			mail -s "[${hostname}] B2 Backup Report (${backupType})" $emailAddress < "${txtEmail}"
-
-			echo "$(<${txtEmail})"
-		fi
 
 		IFS=oldIFS
 	else
-		mail -s "[${hostname}] B2 Backup Report (${backupType})" $emailAddress < "${logBackup}"
+		if [ -f "${logBackupAlt}" ];
+		then
+			tr -cd "[:print:]\n" < ${logBackupAlt} > ${tmpEmail}
+
+			echo "" >> ${tmpEmail}
+		fi
+
+		cat ${logBackup} > ${tmpEmail}
 	fi
+
+
+fi
+
+if [ -f "${tmpEmail}" ];
+then
+	cat ${tmpEmail} > ${txtEmail}
+
+	mail -s "[${hostname}] B2 Backup Report (${backupType})" $emailAddress < "${txtEmail}"
+
+	echo "$(<${txtEmail})"
 fi

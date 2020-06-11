@@ -11,6 +11,7 @@ This is a bash script to be used for automated cron syncing with B2.
 * `sed`
 * `gzip`
 * `perl`
+* `tr`
 * `mail`
 
 For more information on B2, check out the resources provided here:
