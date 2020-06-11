@@ -65,8 +65,8 @@ fi
 
 # Delete older files.
 find . -mindepth 1 -mtime +3 -delete -name "*.log"
-find . -mindepth 1 -mtime +3 -delete-name "*.tmp"
-find . -mindepth 1 -mtime +3 -delete-name "*.txt"
+find . -mindepth 1 -mtime +3 -delete -name "*.tmp"
+find . -mindepth 1 -mtime +3 -delete -name "*.txt"
 
 if [ -z "$1" ];
 then
@@ -83,19 +83,6 @@ fi
 
 if [ -z "$2" ];
 then
-	read -s "Please provide the B2 bucket name for storage: " bucketName
-
-	if [ -z "$bucketName" ];
-	then
-		echo "You must include a valid bucket name. Please try again."
-		exit 1
-	fi
-else
-	bucketName=$2
-fi
-
-if [ -z "$3" ];
-then
 	read -s "What type of backup is this? [mysql / filesystem] " backupType
 
 	if [ -z "$backupType" ];
@@ -104,7 +91,20 @@ then
 		exit 1
 	fi
 else
-	backupType=$3
+	backupType=$2
+fi
+
+if [ -z "$3" ];
+then
+	read -s "Please provide the B2 bucket name for storage: " bucketName
+
+	if [ -z "$bucketName" ];
+	then
+		echo "You must include a valid bucket name. Please try again."
+		exit 1
+	fi
+else
+	bucketName=$23
 fi
 
 echo "Cancelling all unfinished large files..."
