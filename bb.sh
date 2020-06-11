@@ -68,7 +68,7 @@ find . -mindepth 1 -mtime +3 -delete -name "*.log"
 find . -mindepth 1 -mtime +3 -delete-name "*.tmp"
 find . -mindepth 1 -mtime +3 -delete-name "*.txt"
 
-if [ -z "$0" ];
+if [ -z "$1" ];
 then
 	read -s "Please provide the email address for notification: " emailAddress
 
@@ -78,10 +78,10 @@ then
 		exit 1
 	fi
 else
-	emailAddress=$0
+	emailAddress=$1
 fi
 
-if [ -z "$1" ];
+if [ -z "$2" ];
 then
 	read -s "Please provide the B2 bucket name for storage: " bucketName
 
@@ -91,10 +91,10 @@ then
 		exit 1
 	fi
 else
-	bucketName=$1
+	bucketName=$2
 fi
 
-if [ -z "$2" ];
+if [ -z "$3" ];
 then
 	read -s "What type of backup is this? [mysql / filesystem] " backupType
 
@@ -104,7 +104,7 @@ then
 		exit 1
 	fi
 else
-	backupType=$2
+	backupType=$3
 fi
 
 echo "Cancelling all unfinished large files..."
@@ -115,18 +115,18 @@ logBackup="${PWD}/${currentDate}-${bucketName}-backup.log"
 
 if [ "$backupType" == "mysql" ];
 then
-	if [ -z "$3" ];
+	if [ -z "$4" ];
 	then
 		read -s "Please provide the MySQL username as the first argument: " mysqlUsername
 	else
-		mysqlUsername=$3
+		mysqlUsername=$4
 	fi
 
-	if [ -z "$4" ];
+	if [ -z "$5" ];
 	then
 		read -s -p "Please provide the MySQL password: " mysqlPassword
 	else
-		mysqlPassword=$4
+		mysqlPassword=$5
 	fi
 
 	if ! mysql -u $mysqlUsername -p$mysqlPassword -e;
@@ -147,7 +147,7 @@ then
 		b2 upload-file $bucketName "${tmpDir}/${database}.tar.gz" "${database}.tar.gz" > "${logBackup}"
 	done
 else
-	if [ -z "$3" ];
+	if [ -z "$4" ];
 	then
 			read -s "Please provide the folder path to sync: " syncPath
 		if [ -z "$syncPath" ];
@@ -156,16 +156,16 @@ else
 			exit 1
 		fi
 	else
-			syncPath=$3
+			syncPath=$4
 	fi
 
 	echo "Sync: ${syncPath}" >> "${txtEmail}"
 
-	if [ -z "$4" ];
+	if [ -z "$5" ];
 	then
 		b2 sync --excludeAllSymlinks $syncPath "b2://$bucketName" > "${logBackup}"
 	else
-		b2 sync --excludeAllSymlinks --excludeRegex $4 $syncPath "b2://$bucketName" > "${logBackup}"
+		b2 sync --excludeAllSymlinks --excludeRegex $5 $syncPath "b2://$bucketName" > "${logBackup}"
 	fi
 fi
 
