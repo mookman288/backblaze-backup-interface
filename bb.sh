@@ -152,7 +152,7 @@ then
 		mysqldump --skip-lock-tables --add-drop-table --allow-keywords -u $mysqlUsername -p$mysqlPassword ${database} | gzip > "${tmpDir}/${database}.tar.gz"
 
 		#Backup the database to Backblaze.
-		b2 upload-file $bucketName "${tmpDir}/${database}.tar.gz" "${database}.tar.gz" > "${logBackup}"
+		b2 upload-file $bucketName "${tmpDir}/${database}.tar.gz" "${database}.tar.gz" >> "${logBackup}"
 	done
 else
 	if [ -z "$4" ];
@@ -177,127 +177,132 @@ fi
 
 if [ -f "${logBackup}" ];
 then
-	oldIFS=IFS
-	IFS=';;'
-
-	tmpEmail="${PWD}/${currentDate}-${bucketName}-email.tmp"
-	txtEmail="${PWD}/${currentDate}-${bucketName}-email.txt"
-
-	if [ -f "${tmpEmail}" ];
+	if [ "$backupType" == "filesystem" ];
 	then
-		rm "${tmpEmail}"
-	fi
+		oldIFS=IFS
+		IFS=';;'
 
-	if [ -f "${txtEmail}" ];
-	then
-		rm "${txtEmail}"
-	fi
+		tmpEmail="${PWD}/${currentDate}-${bucketName}-email.tmp"
+		txtEmail="${PWD}/${currentDate}-${bucketName}-email.txt"
 
-	declare -a compare=( $(perl -ne 'while(m/(compare\:\s*[0-9]+\/[0-9]+\s*files)/g) { print "$1;;"; }' "${logBackup}" ) )
-	declare -a updated=( $(perl -ne 'while(m/(updated\:\s*[0-9]+\/[0-9]+\s*files)/g) { print "$1;;"; }' "${logBackup}" ) )
-	declare -a size=( $(perl -ne 'while(m/([0-9]{1,}\.{0,1}[0-9]{0,}\s*\/\s*[0-9]{1,}\.{0,1}[0-9]{0,}\s*[K|M|G|T][B])/g) { print "$1;;"; }' "${logBackup}" ) )
-	declare -a warnings=( $(perl -ne 'while(m/WARNING\:\s*(.*)[\n|\r|\t]/gm) { print "$1;;"; }' "${logBackup}" ) )
-	declare -a errors=( $(perl -ne 'while(m/ERROR\:\s*(.*)[\n|\r|\t]/gm) { print "$1;;"; }' "${logBackup}" ) )
-	declare -a services=( $(perl -ne 'while(m/ServiceError\:\s*(.*)[\n|\r|\t]/gm) { print "$1;;"; }' "${logBackup}" ) )
-
-	if [ ! -z "$errors" ];
-	then
-		for s in "${errors[@]}";
-		do
-			if [ ! -z "$s" ];
-			then
-				echo "Error: $s" >> "${tmpEmail}"
-				echo "" >> "${tmpEmail}"
-			fi
-		done
-	fi
-
-	if [ ! -z "$services" ];
-	then
-		for s in "${services[@]}";
-		do
-			if [ ! -z "$s" ];
-			then
-				echo "Service Error: $s" >> "${tmpEmail}"
-				echo "" >> "${tmpEmail}"
-			fi
-		done
-	fi
-
-	if [ ! -z "$warnings" ];
-	then
-		for s in "${warnings[@]}";
-		do
-			if [ ! -z "$s" ];
-			then
-				echo "Warning: $s" >> "${tmpEmail}"
-				echo "" >> "${tmpEmail}"
-			fi
-		done
-	fi
-
-	if [ ! -f "/${currentDate}-email.tmp" ];
-	then
-		if [ ! -z "$compare" ];
+		if [ -f "${tmpEmail}" ];
 		then
-			string="${compare[-2]}"
-			indices=( ${!compare[@]} )
-
-			for ((i=${#indices[@]} - 1; i >= 0; i--));
-			do
-				if [ ! -z "${compare[indices[i]]}" ];
-				then
-					string="${compare[indices[i]]}"
-					break
-				fi
-			done
-
-			echo "Files to ${string}" >> "${tmpEmail}"
+			rm "${tmpEmail}"
 		fi
 
-		if [ ! -z "$updated" ];
+		if [ -f "${txtEmail}" ];
 		then
-			string="${updated[-2]}"
-			indices=( ${!updated[@]} )
-
-			for ((i=${#indices[@]} - 1; i >= 0; i--));
-			do
-				if [ ! -z "${updated[indices[i]]}" ];
-				then
-					string="${updated[indices[i]]}"
-					break
-				fi
-			done
-
-			echo "Files ${string}" >> "${tmpEmail}"
+			rm "${txtEmail}"
 		fi
 
-		if [ ! -z "$size" ];
-		then
-			string="${size[-2]}"
-			indices=( ${!size[@]} )
+		declare -a compare=( $(perl -ne 'while(m/(compare\:\s*[0-9]+\/[0-9]+\s*files)/g) { print "$1;;"; }' "${logBackup}" ) )
+		declare -a updated=( $(perl -ne 'while(m/(updated\:\s*[0-9]+\/[0-9]+\s*files)/g) { print "$1;;"; }' "${logBackup}" ) )
+		declare -a size=( $(perl -ne 'while(m/([0-9]{1,}\.{0,1}[0-9]{0,}\s*\/\s*[0-9]{1,}\.{0,1}[0-9]{0,}\s*[K|M|G|T][B])/g) { print "$1;;"; }' "${logBackup}" ) )
+		declare -a warnings=( $(perl -ne 'while(m/WARNING\:\s*(.*)[\n|\r|\t]/gm) { print "$1;;"; }' "${logBackup}" ) )
+		declare -a errors=( $(perl -ne 'while(m/ERROR\:\s*(.*)[\n|\r|\t]/gm) { print "$1;;"; }' "${logBackup}" ) )
+		declare -a services=( $(perl -ne 'while(m/ServiceError\:\s*(.*)[\n|\r|\t]/gm) { print "$1;;"; }' "${logBackup}" ) )
 
-			for ((i=${#indices[@]} - 1; i >= 0; i--));
+		if [ ! -z "$errors" ];
+		then
+			for s in "${errors[@]}";
 			do
-				if [ ! -z "${size[indices[i]]}" ];
+				if [ ! -z "$s" ];
 				then
-					string="${size[indices[i]]}"
-					break
+					echo "Error: $s" >> "${tmpEmail}"
+					echo "" >> "${tmpEmail}"
 				fi
 			done
-
-			echo "Uploaded ${string}" >> "${tmpEmail}"
 		fi
+
+		if [ ! -z "$services" ];
+		then
+			for s in "${services[@]}";
+			do
+				if [ ! -z "$s" ];
+				then
+					echo "Service Error: $s" >> "${tmpEmail}"
+					echo "" >> "${tmpEmail}"
+				fi
+			done
+		fi
+
+		if [ ! -z "$warnings" ];
+		then
+			for s in "${warnings[@]}";
+			do
+				if [ ! -z "$s" ];
+				then
+					echo "Warning: $s" >> "${tmpEmail}"
+					echo "" >> "${tmpEmail}"
+				fi
+			done
+		fi
+
+		if [ ! -f "/${currentDate}-email.tmp" ];
+		then
+			if [ ! -z "$compare" ];
+			then
+				string="${compare[-2]}"
+				indices=( ${!compare[@]} )
+
+				for ((i=${#indices[@]} - 1; i >= 0; i--));
+				do
+					if [ ! -z "${compare[indices[i]]}" ];
+					then
+						string="${compare[indices[i]]}"
+						break
+					fi
+				done
+
+				echo "Files to ${string}" >> "${tmpEmail}"
+			fi
+
+			if [ ! -z "$updated" ];
+			then
+				string="${updated[-2]}"
+				indices=( ${!updated[@]} )
+
+				for ((i=${#indices[@]} - 1; i >= 0; i--));
+				do
+					if [ ! -z "${updated[indices[i]]}" ];
+					then
+						string="${updated[indices[i]]}"
+						break
+					fi
+				done
+
+				echo "Files ${string}" >> "${tmpEmail}"
+			fi
+
+			if [ ! -z "$size" ];
+			then
+				string="${size[-2]}"
+				indices=( ${!size[@]} )
+
+				for ((i=${#indices[@]} - 1; i >= 0; i--));
+				do
+					if [ ! -z "${size[indices[i]]}" ];
+					then
+						string="${size[indices[i]]}"
+						break
+					fi
+				done
+
+				echo "Uploaded ${string}" >> "${tmpEmail}"
+			fi
+		fi
+
+		if [ -f "${tmpEmail}" ];
+		then
+			cat "${tmpEmail}" > "${txtEmail}"
+
+			mail -s "[${hostname}] B2 Backup Report (${backupType})" $emailAddress < "${txtEmail}"
+
+			echo "$(<${txtEmail})"
+		fi
+
+		IFS=oldIFS
+	else
+		mail -s "[${hostname}] B2 Backup Report (${backupType})" $emailAddress < "${logBackup}"
 	fi
-
-	if [ -f "${tmpEmail}" ];
-	then
-		cat "${tmpEmail}" > "${txtEmail}"
-
-		mail -s "[${hostname}] B2 Backup Report (${backupType})" $emailAddress < "${txtEmail}"
-
-		echo "$(<${txtEmail})"
-	fi
-
-	IFS=oldIFS
 fi
