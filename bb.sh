@@ -314,7 +314,7 @@ then
 			echo "" >> ${tmpEmail}
 		fi
 
-		cat ${logBackup} > ${tmpEmail}
+		cat ${logBackup} >> ${tmpEmail}
 	fi
 
 
