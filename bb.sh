@@ -152,7 +152,7 @@ then
 		mysqldump --skip-lock-tables --add-drop-table --allow-keywords -u $mysqlUsername -p$mysqlPassword ${database} | gzip > "${tmpDir}/${database}.tar.gz"
 
 		#Backup the database to Backblaze.
-		b2 upload-file $bucketName "${tmpDir}/${database}.tar.gz" "${database}.tar.gz" >> "${logBackup}"
+		b2 upload-file $bucketName "${tmpDir}/${database}.tar.gz" "${database}.tar.gz" >> "${logBackup}" 2>&1
 	done
 else
 	if [ -z "$4" ];
@@ -169,9 +169,9 @@ else
 
 	if [ -z "$5" ];
 	then
-		b2 sync --excludeAllSymlinks $syncPath "b2://$bucketName" > "${logBackup}"
+		b2 sync --excludeAllSymlinks $syncPath "b2://$bucketName" > "${logBackup}" 2>&1
 	else
-		b2 sync --excludeAllSymlinks --excludeRegex $5 $syncPath "b2://$bucketName" > "${logBackup}"
+		b2 sync --excludeAllSymlinks --excludeRegex $5 $syncPath "b2://$bucketName" > "${logBackup}" 2>&1
 	fi
 fi
 
