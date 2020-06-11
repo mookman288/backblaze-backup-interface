@@ -104,7 +104,7 @@ then
 		exit 1
 	fi
 else
-	bucketName=$23
+	bucketName=$3
 fi
 
 echo "Cancelling all unfinished large files..."
@@ -158,8 +158,6 @@ else
 	else
 			syncPath=$4
 	fi
-
-	echo "Sync: ${syncPath}" >> "${txtEmail}"
 
 	if [ -z "$5" ];
 	then
@@ -284,11 +282,14 @@ then
 		fi
 	fi
 
-	cat "${tmpEmail}" > "${txtEmail}"
+	if [ -f "${tmpEmail}" ];
+	then
+		cat "${tmpEmail}" > "${txtEmail}"
 
-	mail -s "${hostname} ${backupType} B2 Backup Report" $emailAddress < "${txtEmail}"
+		mail -s "${hostname} ${backupType} B2 Backup Report" $emailAddress < "${txtEmail}"
 
-	echo "$(<${currentDate}-email.txt)"
+		echo "$(<${currentDate}-email.txt)"
+	fi
 
 	IFS=oldIFS
 fi

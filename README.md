@@ -27,6 +27,12 @@ git clone https://github.com/mookman288/bb-backup-interface
 chmod +x bb.sh
 ```
 
+## Updates
+
+```
+git checkout bb.sh && git pull origin master && chmod +x bb.sh
+```
+
 ## Usage
 
 ```
