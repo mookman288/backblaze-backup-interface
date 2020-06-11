@@ -53,9 +53,14 @@ currentDate=$(date +"%d-%m-%Y")
 
 if [ ! hash mktemp 2>/dev/null ];
 then
-	tmpDir="/tmp"
+	tmpDir="/tmp/bb.sh"
 else
 	tmpDir=$(mktemp)
+fi
+
+if [ ! -d "${tmpDir}" ];
+then
+	mkdir ${tmpDir}
 fi
 
 if [ -z "$PWD" ];
@@ -138,7 +143,10 @@ then
 	for database in `echo 'SHOW DATABASES' | mysql -u $mysqlUsername -p$mysqlPassword | sed /^Database$/d`
 	do
 		#Remove the database if it exists.
-		rm ${tmpDir}/${database}.tar.gz
+		if [ -f ${tmpDir}/${database}.tar.gz ];
+		then
+			rm ${tmpDir}/${database}.tar.gz
+		fi
 
 		#Dump the database.
 		mysqldump --skip-lock-tables --add-drop-table --allow-keywords -u $mysqlUsername -p$mysqlPassword ${database} | gzip > "${tmpDir}/${database}.tar.gz"
