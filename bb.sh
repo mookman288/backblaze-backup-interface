@@ -164,7 +164,6 @@ else
 	if [ -z "$4" ];
 	then
 		b2 sync --excludeAllSymlinks $syncPath "b2://$bucketName" > "${logBackup}"
-	fi
 	else
 		b2 sync --excludeAllSymlinks --excludeRegex $4 $syncPath "b2://$bucketName" > "${logBackup}"
 	fi
