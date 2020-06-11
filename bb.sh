@@ -286,9 +286,9 @@ then
 	then
 		cat "${tmpEmail}" > "${txtEmail}"
 
-		mail -s "${hostname} ${backupType} B2 Backup Report" $emailAddress < "${txtEmail}"
+		mail -s "[${hostname}] B2 Backup Report (${backupType})" $emailAddress < "${txtEmail}"
 
-		echo "$(<${currentDate}-email.txt)"
+		echo "$(<${txtEmail})"
 	fi
 
 	IFS=oldIFS
