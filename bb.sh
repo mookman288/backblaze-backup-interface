@@ -129,7 +129,7 @@ then
 		mysqlPassword=$5
 	fi
 
-	if ! mysql -u $mysqlUsername -p$mysqlPassword -e;
+	if ! mysql -u $mysqlUsername -p$mysqlPassword -e exit;
 	then
 		echo "Please enter valid credentials to access all database information."
 		exit 1
