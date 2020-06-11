@@ -119,6 +119,16 @@ b2 cancel_all_unfinished_large_files $bucketName
 logBackup="${PWD}/${currentDate}-${bucketName}-backup.log"
 logBackupAlt="${PWD}/${currentDate}-${bucketName}-backup-alt.log"
 
+if [ -f "${logBackup}" ];
+then
+	rm "${logBackup}"
+fi
+
+if [ -f "${logBackupAlt}" ];
+then
+	rm "${logBackupAlt}"
+fi
+
 if [ "$backupType" == "mysql" ];
 then
 	if [ -z "$4" ];
