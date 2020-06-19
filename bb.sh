@@ -153,16 +153,16 @@ then
 
 	for database in `echo 'SHOW DATABASES' | mysql -u $mysqlUsername -p$mysqlPassword | sed /^Database$/d`
 	do
-		#Remove the database if it exists.
+		# Remove the database if it exists.
 		if [ -f ${tmpDir}/${database}.tar.gz ];
 		then
 			rm ${tmpDir}/${database}.tar.gz
 		fi
 
-		#Dump the database.
+		# Dump the database.
 		mysqldump --skip-lock-tables --add-drop-table --allow-keywords -u $mysqlUsername -p$mysqlPassword ${database} | gzip > "${tmpDir}/${database}.tar.gz"
 
-		#Backup the database to Backblaze.
+		# Backup the database to Backblaze.
 		b2 upload-file $bucketName "${tmpDir}/${database}.tar.gz" "${database}.tar.gz" 2>>${logBackupAlt} 1>>${logBackup}
 	done
 else
@@ -206,6 +206,7 @@ then
 		oldIFS=IFS
 		IFS=';;'
 
+		# Use regex to parse the backblaze log to gather information.
 		declare -a compare=( $(perl -ne 'while(m/(compare\:\s*[0-9]+\/[0-9]+\s*files)/g) { print "$1;;"; }' ${logBackup} ) )
 		declare -a updated=( $(perl -ne 'while(m/(updated\:\s*[0-9]+\/[0-9]+\s*files)/g) { print "$1;;"; }' ${logBackup} ) )
 		declare -a size=( $(perl -ne 'while(m/([0-9]{1,}\.{0,1}[0-9]{0,}\s*\/\s*[0-9]{1,}\.{0,1}[0-9]{0,}\s*[K|M|G|T][B])/g) { print "$1;;"; }' ${logBackup} ) )
@@ -303,21 +304,27 @@ then
 			fi
 		fi
 
-
-
 		IFS=oldIFS
 	else
 		if [ -f "${logBackupAlt}" ];
 		then
-			tr -cd "[:print:]\n" < ${logBackupAlt} > ${tmpEmail}
+			# Remove non-printable characters.
+			tr -cd "[:print:]" < ${logBackupAlt} > ${tmpEmail}
+
+			# Remove vertical bars.
+			perl -i -p -e "s/\|/ /g" ${tmpEmail}
+
+			# Remove spaces.
+			perl -i -p -e "s/ +/ /g" ${tmpEmail}
+
+			# Add new lines.
+			perl -i -p -e "s/\]/\n/g" ${tmpEmail}
 
 			echo "" >> ${tmpEmail}
 		fi
 
 		cat ${logBackup} >> ${tmpEmail}
 	fi
-
-
 fi
 
 if [ -f "${tmpEmail}" ];
