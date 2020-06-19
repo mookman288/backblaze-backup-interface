@@ -6,7 +6,7 @@ then
 	exit 1
 fi
 
-if [ ! find b2 2>/dev/null ];
+if [ ! hash find 2>/dev/null ];
 then
 	echo "Please ensure that find is installed."
 	exit 1
@@ -69,9 +69,9 @@ then
 fi
 
 # Delete older files.
-find . -mindepth 1 -mtime +3 -delete -name "*.log"
-find . -mindepth 1 -mtime +3 -delete -name "*.tmp"
-find . -mindepth 1 -mtime +3 -delete -name "*.txt"
+find . -maxdepth 1 -mtime +3 -delete -name "*.log"
+find . -maxdepth 1 -mtime +3 -delete -name "*.tmp"
+find . -maxdepth 1 -mtime +3 -delete -name "*.txt"
 
 if [ -z "$1" ];
 then
