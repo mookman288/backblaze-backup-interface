@@ -186,11 +186,11 @@ else
 	fi
 fi
 
+tmpEmail="${PWD}/${currentDate}-${bucketName}-email.tmp"
+txtEmail="${PWD}/${currentDate}-${bucketName}-email.txt"
+
 if [ -f "${logBackup}" ];
 then
-	tmpEmail="${PWD}/${currentDate}-${bucketName}-email.tmp"
-	txtEmail="${PWD}/${currentDate}-${bucketName}-email.txt"
-
 	if [ -f "${tmpEmail}" ];
 	then
 		rm "${tmpEmail}"
