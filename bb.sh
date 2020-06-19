@@ -187,20 +187,14 @@ else
 fi
 
 tmpEmail="${PWD}/${currentDate}-${bucketName}-email.tmp"
-txtEmail="${PWD}/${currentDate}-${bucketName}-email.txt"
+
+if [ -f "${tmpEmail}" ];
+then
+	rm "${tmpEmail}"
+fi
 
 if [ -f "${logBackup}" ];
 then
-	if [ -f "${tmpEmail}" ];
-	then
-		rm "${tmpEmail}"
-	fi
-
-	if [ -f "${txtEmail}" ];
-	then
-		rm "${txtEmail}"
-	fi
-
 	if [ "$backupType" == "filesystem" ];
 	then
 		oldIFS=IFS
@@ -309,27 +303,34 @@ then
 		if [ -f "${logBackupAlt}" ];
 		then
 			# Remove non-printable characters.
-			tr -cd "[:print:]" < ${logBackupAlt} > ${tmpEmail}
+			tr -cd "[:print:]" < ${logBackupAlt} > "${tmpEmail}"
 
 			# Remove vertical bars.
-			perl -i -p -e "s/\|/ /g" ${tmpEmail}
+			perl -i -p -e "s/\|/ /g" "${tmpEmail}"
 
 			# Remove spaces.
-			perl -i -p -e "s/ +/ /g" ${tmpEmail}
+			perl -i -p -e "s/ +/ /g" "${tmpEmail}"
 
 			# Add new lines.
-			perl -i -p -e "s/\]/\n/g" ${tmpEmail}
+			perl -i -p -e "s/\]/\n/g" "${tmpEmail}"
 
-			echo "" >> ${tmpEmail}
+			echo "" >> "${tmpEmail}"
 		fi
 
-		cat ${logBackup} >> ${tmpEmail}
+		cat ${logBackup} >> "${tmpEmail}"
 	fi
+fi
+
+txtEmail="${PWD}/${currentDate}-${bucketName}-email.txt"
+
+if [ -f "${txtEmail}" ];
+then
+	rm "${txtEmail}"
 fi
 
 if [ -f "${tmpEmail}" ];
 then
-	cat ${tmpEmail} > ${txtEmail}
+	cat "${tmpEmail}" > "${txtEmail}"
 
 	mail -s "[${hostname}] B2 Backup Report (${backupType})" $emailAddress < "${txtEmail}"
 
