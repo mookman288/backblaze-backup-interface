@@ -321,18 +321,9 @@ then
 	fi
 fi
 
-txtEmail="${PWD}/${currentDate}-${bucketName}-email.txt"
-
-if [ -f "${txtEmail}" ];
-then
-	rm "${txtEmail}"
-fi
-
 if [ -f "${tmpEmail}" ];
 then
-	cat "${tmpEmail}" > "${txtEmail}"
+	cat "${tmpEmail}" | mail -s "[${hostname}] B2 Backup Report (${backupType})" "${emailAddress}"
 
-	mail -s "[${hostname}] B2 Backup Report (${backupType})" $emailAddress < "${txtEmail}"
-
-	echo "$(<${txtEmail})"
+	cat "${tmpEmail}"
 fi
