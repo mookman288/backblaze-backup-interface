@@ -14,6 +14,10 @@ This is a bash script to be used for automated cron syncing with B2.
 * `tr`
 * `mail`
 
+If using as a cronjob, ensure that the path is set:
+
+https://unix.stackexchange.com/a/384728
+
 For more information on B2, check out the resources provided here:
 
 https://www.backblaze.com/b2/docs/
