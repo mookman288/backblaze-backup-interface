@@ -1,48 +1,48 @@
 #!/bin/bash
 
-if [ ! hash b2 2>/dev/null ];
+if [ ! command -v b2 &> /dev/null ];
 then
 	echo "Please ensure that BackBlaze B2 CLI is installed."
 	exit 1
 fi
 
-if [ ! hash find 2>/dev/null ];
+if [ ! command -v find &> /dev/null ];
 then
 	echo "Please ensure that find is installed."
 	exit 1
 fi
 
-if [ ! hash cat 2>/dev/null ];
+if [ ! command -v cat &> /dev/null ];
 then
 	echo "Please ensure that cat is installed."
 	exit 1
 fi
 
-if [ ! hash sed 2>/dev/null ];
+if [ ! command -v sed &> /dev/null ];
 then
 	echo "Please ensure that sed is installed."
 	exit 1
 fi
 
-if [ ! hash gzip 2>/dev/null ];
+if [ ! command -v gzip &> /dev/null ];
 then
 	echo "Please ensure that gzip is installed."
 	exit 1
 fi
 
-if [ ! hash mail 2>/dev/null ];
+if [ ! command -v mail &> /dev/null ];
 then
 	echo "Please ensure that the mail command is installed."
 	exit 1
 fi
 
-if [ ! hash perl 2>/dev/null ];
+if [ ! command -v perl &> /dev/null ];
 then
 	echo "Please ensure that perl is installed."
 	exit 1
 fi
 
-if [ ! hash hostname 2>/dev/null ];
+if [ ! command -v hostname &> /dev/null ];
 then
 	hostname=$(whoami)
 else
@@ -51,7 +51,7 @@ fi
 
 currentDate=$(date +"%d-%m-%Y")
 
-if [ ! hash mktemp 2>/dev/null ];
+if [ ! command -v mktemp &> /dev/null ];
 then
 	tmpDir="/tmp/bb.sh"
 else
