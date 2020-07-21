@@ -65,13 +65,14 @@ fi
 
 if [ -z "$PWD" ];
 then
-	$PWD="."
+	#https://stackoverflow.com/a/4774063/1617361
+	$PWD="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 fi
 
 # Delete older files.
-find . -maxdepth 1 -mtime +3 -delete -name "*.log"
-find . -maxdepth 1 -mtime +3 -delete -name "*.tmp"
-find . -maxdepth 1 -mtime +3 -delete -name "*.txt"
+find $PWD -maxdepth 0 -mtime +3 -delete -regex ".*\.log"
+find $PWD -maxdepth 0 -mtime +3 -delete -regex ".*\.tmp"
+find $PWD -maxdepth 0 -mtime +3 -delete -regex ".*\.txt"
 
 if [ -z "$1" ];
 then
