@@ -63,11 +63,8 @@ then
 	mkdir ${tmpDir}
 fi
 
-if [ -z "$PWD" ];
-then
-	#https://stackoverflow.com/a/4774063/1617361
-	$PWD="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-fi
+#https://www.ostricher.com/2014/10/the-right-way-to-get-the-directory-of-a-bash-script/
+$PWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Delete older files.
 find $PWD -maxdepth 0 -mtime +3 -delete -regex ".*\.log"
