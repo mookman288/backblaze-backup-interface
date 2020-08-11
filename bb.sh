@@ -67,9 +67,9 @@ fi
 $PWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Delete older files.
-find $PWD -maxdepth 0 -mtime +3 -delete -regex ".*\.log"
-find $PWD -maxdepth 0 -mtime +3 -delete -regex ".*\.tmp"
-find $PWD -maxdepth 0 -mtime +3 -delete -regex ".*\.txt"
+find "${PWD}/bbsh*" -maxdepth 0 -mtime +3 -delete -regex ".*\.log"
+find "${PWD}/bbsh*" -maxdepth 0 -mtime +3 -delete -regex ".*\.tmp"
+find "${PWD}/bbsh*" -maxdepth 0 -mtime +3 -delete -regex ".*\.txt"
 
 if [ -z "$1" ];
 then
@@ -114,8 +114,8 @@ echo "Cancelling all unfinished large files..."
 
 b2 cancel_all_unfinished_large_files $bucketName
 
-logBackup="${PWD}/${currentDate}-${bucketName}-backup.log"
-logBackupAlt="${PWD}/${currentDate}-${bucketName}-backup-alt.log"
+logBackup="${PWD}/bbsh-${currentDate}-${bucketName}-backup.log"
+logBackupAlt="${PWD}/bbsh-${currentDate}-${bucketName}-backup-alt.log"
 
 if [ -f "${logBackup}" ];
 then
@@ -184,7 +184,7 @@ else
 	fi
 fi
 
-tmpEmail="${PWD}/${currentDate}-${bucketName}-email.tmp"
+tmpEmail="${PWD}/bbsh-${currentDate}-${bucketName}-email.tmp"
 
 if [ -f "${tmpEmail}" ];
 then
