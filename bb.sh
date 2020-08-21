@@ -321,7 +321,7 @@ fi
 
 if [ -f "${tmpEmail}" ];
 then
-	cat "${tmpEmail}" | mail -s "[${hostname}] B2 Backup Report (${backupType})" "${emailAddress}"
+	cat "${tmpEmail}" | mail -s "[${hostname}] B2 Backup Report (${backupType} - ${bucketName})" "${emailAddress}"
 
 	cat "${tmpEmail}"
 fi
