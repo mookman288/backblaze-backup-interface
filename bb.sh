@@ -114,9 +114,9 @@ echo "Cancelling all unfinished large files..."
 
 b2 cancel_all_unfinished_large_files $bucketName
 
-logBackupBucketName="${bucketName//\//-}"
-logBackup="${PWD}/bbsh-${currentDate}-${logBackupBucketName}-backup.log"
-logBackupAlt="${PWD}/bbsh-${currentDate}-${logBackupBucketName}-backup-alt.log"
+safeBucketName="${bucketName//\//-}"
+logBackup="${PWD}/bbsh-${currentDate}-${safeBucketName}-backup.log"
+logBackupAlt="${PWD}/bbsh-${currentDate}-${safeBucketName}-backup-alt.log"
 
 if [ -f "${logBackup}" ];
 then
@@ -185,7 +185,7 @@ else
 	fi
 fi
 
-tmpEmail="${PWD}/bbsh-${currentDate}-${bucketName}-email.tmp"
+tmpEmail="${PWD}/bbsh-${currentDate}-${safeBucketName}-email.tmp"
 
 if [ -f "${tmpEmail}" ];
 then
