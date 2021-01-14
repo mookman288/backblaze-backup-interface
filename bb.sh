@@ -114,22 +114,19 @@ echo "Cancelling all unfinished large files..."
 
 b2 cancel_all_unfinished_large_files $bucketName
 
-logBackup="${PWD}/bbsh-${currentDate}-${bucketName}-backup.log"
-logBackupAlt="${PWD}/bbsh-${currentDate}-${bucketName}-backup-alt.log"
+logBackupBucketName="${bucketName}//\//-"
+logBackup="${PWD}/bbsh-${currentDate}-${logBackupBucketName}-backup.log"
+logBackupAlt="${PWD}/bbsh-${currentDate}-${logBackupBucketName}-backup-alt.log"
 
 if [ -f "${logBackup}" ];
 then
 	rm "${logBackup}"
 fi
 
-touch ${logBackup}
-
 if [ -f "${logBackupAlt}" ];
 then
 	rm "${logBackupAlt}"
 fi
-
-touch ${logBackupAlt}
 
 if [ "$backupType" == "mysql" ];
 then
