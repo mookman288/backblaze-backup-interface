@@ -114,7 +114,7 @@ echo "Cancelling all unfinished large files..."
 
 b2 cancel_all_unfinished_large_files $bucketName
 
-logBackupBucketName="${bucketName}//\//-"
+logBackupBucketName="${bucketName//\//-}"
 logBackup="${PWD}/bbsh-${currentDate}-${logBackupBucketName}-backup.log"
 logBackupAlt="${PWD}/bbsh-${currentDate}-${logBackupBucketName}-backup-alt.log"
 
