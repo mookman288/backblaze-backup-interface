@@ -122,10 +122,14 @@ then
 	rm "${logBackup}"
 fi
 
+touch ${logBackup}
+
 if [ -f "${logBackupAlt}" ];
 then
 	rm "${logBackupAlt}"
 fi
+
+touch ${logBackupAlt}
 
 if [ "$backupType" == "mysql" ];
 then
