@@ -52,6 +52,10 @@ Note: `--excludeAllSymlinks` is enabled by default.
 ./bb.sh email@website.tld filesystem mybucket /var/backups
 ```
 
+## Auto Cleanup of Log Files
+
+If you want the system to automatically clean up log files, uncomment lines starting after `# Delete older files.`.
+
 ## License
 
 MIT License

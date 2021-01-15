@@ -67,9 +67,9 @@ fi
 $PWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Delete older files.
-find "${PWD}/bbsh*" -maxdepth 0 -mtime +3 -delete -regex ".*\.log"
-find "${PWD}/bbsh*" -maxdepth 0 -mtime +3 -delete -regex ".*\.tmp"
-find "${PWD}/bbsh*" -maxdepth 0 -mtime +3 -delete -regex ".*\.txt"
+#find "${PWD}/bbsh*" -maxdepth 0 -mtime +3 -delete -regex ".*\.log"
+#find "${PWD}/bbsh*" -maxdepth 0 -mtime +3 -delete -regex ".*\.tmp"
+#find "${PWD}/bbsh*" -maxdepth 0 -mtime +3 -delete -regex ".*\.txt"
 
 if [ -z "$1" ];
 then
