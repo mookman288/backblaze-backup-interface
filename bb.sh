@@ -112,7 +112,9 @@ fi
 
 echo "Cancelling all unfinished large files..."
 
-b2 cancel_all_unfinished_large_files $bucketName
+trueBucketName=$(echo $bucketName | sed 's/\/.*//')
+
+b2 cancel_all_unfinished_large_files $trueBucketName
 
 safeBucketName="${bucketName//\//-}"
 logBackup="${PWD}/bbsh-${currentDate}-${safeBucketName}-backup.log"
